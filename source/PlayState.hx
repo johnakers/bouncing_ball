@@ -1,17 +1,16 @@
 package;
 
 import flixel.FlxG;
-import flixel.FlxSprite;
 import flixel.FlxState;
-import flixel.group.FlxGroup.FlxTypedGroup;
-import flixel.util.FlxColor;
+import flixel.text.FlxText;
+import flixel.ui.FlxButton;
 
 class PlayState extends FlxState
 {
-	private var ball:Ball;
-	private var shadow:Shadow;
+	private var ballGroup:BallGroup;
 	private var powerMeter:PowerMeter;
-	private var wallsGroup:FlxTypedGroup<FlxSprite>;
+	private var walls:Walls;
+	private var addBallButton:FlxButton;
 
 	// https://www.ohsat.com/tutorial/flixel/hf-breakout/hf-breakout-2/
 	override public function create()
@@ -23,74 +22,60 @@ class PlayState extends FlxState
 		// FlxG.debugger.drawDebug = true;
 		// FlxG.log.redirectTraces = true;
 
-		this.shadow = new Shadow(0, 0);
-		this.add(this.shadow);
-
-		this.ball = new Ball(0, 0);
-		this.ball.screenCenter();
-		this.add(this.ball);
+		this.ballGroup = new BallGroup(0, 0);
+		this.ballGroup.balls[0].screenCenter();
+		this.add(this.ballGroup);
 
 		this.powerMeter = new PowerMeter(10, 10);
 		this.add(this.powerMeter);
 
-		this.wallsGroup = new FlxTypedGroup<FlxSprite>();
+		this.addBallButton = new FlxButton(130, 10, "Add Ball", clickAddBall);
+		add(this.addBallButton);
 
-		var topWall = new FlxSprite(0, 0);
-		topWall.makeGraphic(FlxG.width, 8, FlxColor.LIME);
-		this.wallsGroup.add(topWall);
+		this.walls = new Walls();
+		add(this.walls);
 
-		var bottomWall = new FlxSprite(0, FlxG.height - 8);
-		bottomWall.makeGraphic(FlxG.width, 8, FlxColor.LIME);
-		this.wallsGroup.add(bottomWall);
-
-		var leftWall = new FlxSprite(0, 0);
-		leftWall.makeGraphic(8, FlxG.height, FlxColor.LIME);
-		this.wallsGroup.add(leftWall);
-
-		var rightWall = new FlxSprite(FlxG.width - 8, 0);
-		rightWall.makeGraphic(8, FlxG.height, FlxColor.LIME);
-		this.wallsGroup.add(rightWall);
-
-		add(this.wallsGroup);
-
-		for (wall in this.wallsGroup)
-		{
-			wall.immovable = true;
-		}
+		var instructions = new FlxText(10, FlxG.height - 32, 0, "Use LEFT/RIGHT arrow keys to aim ball\nHold SPACEBAR to launch ball");
+		add(instructions);
 	}
 
 	override public function update(elapsed:Float)
 	{
 		super.update(elapsed);
 
-		FlxG.collide(ball, this.wallsGroup, updateBallAngle);
+		FlxG.collide(this.ballGroup, this.walls, additionalBallExecutes);
 
 		if (FlxG.keys.justReleased.SPACE)
 		{
 			// Launch the ball!
 			// Multiply power (0-100) by a factor (e.g. 10) to get speed in pixels/sec
 			var speed = this.powerMeter.power * 10;
-			var radians = this.ball.angle * (Math.PI / 180);
-			this.ball.velocity.set(Math.cos(radians) * speed, Math.sin(radians) * speed);
 
-			// Launch into the air!
-			this.ball.zVelocity = this.powerMeter.power * 5;
+			for (ball in this.ballGroup.balls)
+			{
+				var radians = ball.angle * (Math.PI / 180);
+				ball.velocity.set(Math.cos(radians) * speed, Math.sin(radians) * speed);
+				// Launch into the air!
+				ball.zVelocity = this.powerMeter.power * 5;
+			}
 
 			// Reset the meter
 			this.powerMeter.power = 0;
 		}
-
-		updateShadow();
 	}
 
-	private function updateBallAngle(ball:Dynamic, wall:Dynamic)
+	// FIXME: When we bounce off top/bottom walls, it seems the angle gets reversed
+	private function additionalBallExecutes(ball:Dynamic, wall:Dynamic)
 	{
-		ball.angle = 180 - ball.angle;
+		// ball.angle = 180 - ball.angle;
+		FlxG.sound.play("assets/sounds/Hit43.wav");
 	}
 
-	private function updateShadow()
+	private function clickAddBall():Void
 	{
-		this.shadow.x = this.ball.x;
-		this.shadow.y = this.ball.y;
+		var randomX = FlxG.random.float(50, FlxG.width - 50);
+		var randomY = FlxG.random.float(50, FlxG.height - 200);
+		ballGroup.addBall(randomX, randomY);
+		FlxG.sound.play("assets/sounds/Pickup35.wav");
 	}
 }

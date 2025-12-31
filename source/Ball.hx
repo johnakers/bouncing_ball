@@ -21,8 +21,7 @@ class Ball extends FlxSprite
 
     this.animation.add("roll", [0, 1, 2, 3], 30, true);
 
-    // Enable collision with world bounds (screen edges by default)
-    // collideWorldBounds = true;
+		// Enable collision with world bounds (screen edges by default)
     elasticity = 1;
   }
 
