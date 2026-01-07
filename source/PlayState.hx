@@ -1,5 +1,6 @@
 package;
 
+import flixel.util.FlxColor;
 import flixel.FlxG;
 import flixel.FlxState;
 import flixel.text.FlxText;
@@ -30,12 +31,15 @@ class PlayState extends FlxState
 		this.add(this.powerMeter);
 
 		this.addBallButton = new FlxButton(130, 10, "Add Ball", clickAddBall);
+		this.addBallButton.label.font = "assets/fonts/04B_03__.TTF";
+		this.addBallButton.label.setFormat(null, 10, FlxColor.BLACK);
 		add(this.addBallButton);
 
 		this.walls = new Walls();
 		add(this.walls);
 
-		var instructions = new FlxText(10, FlxG.height - 32, 0, "Use LEFT/RIGHT arrow keys to aim ball\nHold SPACEBAR to launch ball");
+		var instructions = new FlxText(10, FlxG.height - 32, 0, "Use LEFT/RIGHT arrow keys to aim ball\nHold SPACEBAR to launch ball", 10);
+		instructions.font = "assets/fonts/04B_03__.TTF";
 		add(instructions);
 	}
 
