@@ -1,10 +1,10 @@
 package;
 
-import flixel.util.FlxColor;
 import flixel.FlxG;
 import flixel.FlxState;
 import flixel.text.FlxText;
 import flixel.ui.FlxButton;
+import flixel.util.FlxColor;
 
 class PlayState extends FlxState
 {
@@ -31,8 +31,7 @@ class PlayState extends FlxState
 		this.add(this.powerMeter);
 
 		this.addBallButton = new FlxButton(130, 10, "Add Ball", clickAddBall);
-		this.addBallButton.label.font = "assets/fonts/04B_03__.TTF";
-		this.addBallButton.label.setFormat(null, 10, FlxColor.BLACK);
+		this.addBallButton.label.setFormat("assets/fonts/04B_03__.TTF", 10, FlxColor.BLACK, FlxTextAlign.CENTER);
 		add(this.addBallButton);
 
 		this.walls = new Walls();
